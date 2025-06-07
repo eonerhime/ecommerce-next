@@ -1,16 +1,118 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, FormEvent, Suspense } from "react";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ChevronLeft, Loader2 } from "lucide-react";
+import { getSignupFormData, handleSignupSubmit } from "@/actions/auth/signup";
+import { getLoginFormData, handleLoginSubmit } from "@/actions/auth/login";
+import { useRouter, useSearchParams } from "next/navigation";
+import { toast } from "sonner";
+import { IAttributes } from "oneentry/dist/base/utils";
 
-export default function AuthPage() {
+interface SignUpFormData {
+  email: string;
+  password: string;
+  name: string;
+}
+
+interface LoginFormData {
+  email: string;
+  password: string;
+}
+
+function AuthForm() {
   const [isSignUp, setIsSignUp] = useState(true);
-  const router = useRouter();
 
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [formData, setFormData] = useState<IAttributes[]>([]);
+  const [inputValues, setInputValues] = useState<
+    Partial<SignUpFormData & LoginFormData>
+  >({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>("Not valid");
+
+  useEffect(() => {
+    const type = searchParams.get("type");
+    setIsSignUp(type !== "login");
+  }, [searchParams]);
+
+  useEffect(() => {
+    setIsLoading(true);
+    setError(null);
+
+    const fetchData = isSignUp ? getSignupFormData : getLoginFormData;
+
+    fetchData()
+      .then((data) => setFormData(data))
+      .catch((err) => setError(`Failed to fetch form data: ${err}`))
+      .finally(() => setIsLoading(false));
+  }, [isSignUp]);
+
+  // Handles input changes and updates the state.
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setInputValues((prevValues) => ({ ...prevValues, [name]: value }));
+  };
+
+  // Handles form submission for both sign up and login.
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      if (isSignUp) {
+        if (inputValues.email && inputValues.password && inputValues.name) {
+          const response = await handleSignupSubmit(
+            inputValues as SignUpFormData
+          );
+
+          if ("identifier" in response) {
+            setInputValues({});
+            setIsSignUp(false);
+            toast("User has been created", {
+              description: "Please enter your credentials to log in.",
+              duration: 5000,
+            });
+          } else {
+            setError(response.message);
+          }
+        } else {
+          setError("Please fill out all required fields.");
+        }
+      } else {
+        if (inputValues.email && inputValues.password) {
+          const response = await handleLoginSubmit(
+            inputValues as LoginFormData
+          );
+          if (response.message) {
+            setError(response.message);
+          }
+        } else {
+          setError("Please fill out all required fields.");
+        }
+      }
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "An error occurred. Please try again."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Toggles between signup and login forms.
   const toggleForm = () => {
     setIsSignUp(!isSignUp);
+    setError(null);
+    // Reset input values when toggling forms
+    setInputValues({});
   };
 
   return (
@@ -32,14 +134,14 @@ export default function AuthPage() {
             </h2>
             <p className="text-base sm:text-lg lg:text-xl text-gray-400 mb-6 sm:mb-8">
               {isSignUp
-                ? "Join BlueGypsy's today and discover exclusive deals on your favorite products!"
-                : "Welcome back to BlueGypsy's Store! Log in to continue your shopping journey."}
+                ? "Join BlueGypsy today and discover exclusive deals on your favorite products!"
+                : "Welcome back to BlueGypsy! Log in to continue your shopping journey."}
             </p>
           </div>
 
           {/* Form and loading */}
 
-          {/* {isLoading ? (
+          {isLoading ? (
             <div className="flex justify-center items-center h-64">
               <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
             </div>
@@ -89,7 +191,7 @@ export default function AuthPage() {
                 </Button>
               </div>
             </form>
-          )} */}
+          )}
 
           {/* Toggle form */}
           <div className="mt-4 sm:mt-5 flex items-center justify-center">
@@ -107,5 +209,13 @@ export default function AuthPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function Component() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <AuthForm />
+    </Suspense>
   );
 }
