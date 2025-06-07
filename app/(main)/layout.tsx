@@ -1,5 +1,17 @@
-import HomePage from "./page";
+import Navbar from "@/components/Navbar";
+import React from "react";
 
-export default function layout() {
-  return <HomePage />;
-}
+const layout = ({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) => {
+  return (
+    <div className="">
+      <Navbar />
+      <div className="py-20">{children}</div>
+    </div>
+  );
+};
+
+export default layout;

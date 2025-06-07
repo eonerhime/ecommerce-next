@@ -129,8 +129,10 @@ function AuthForm() {
 
           {/* Form header */}
           <div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-purple-600 via-pink-500 to-red-500 bg-clip-text text-transparent pb-3">
-              {isSignUp ? "Sign Up" : "Sign In"}
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 pb-3">
+              <span className="bg-gradient-to-r  from-blue-600 via-teal-500 to-green-500 bg-clip-text text-transparent">
+                {isSignUp ? "Sign Up" : "Sign In"}
+              </span>
             </h2>
             <p className="text-base sm:text-lg lg:text-xl text-gray-400 mb-6 sm:mb-8">
               {isSignUp
@@ -178,7 +180,7 @@ function AuthForm() {
 
               <div>
                 <Button
-                  className="w-full bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 hover:from-purple-600 hover:via-pink-600 hover:to-red-600 text-white text-base sm:text-xl font-bold p-4 sm:p-6 rounded-md shadow-xl transition-colors duration-300 ease-in-out cursor-pointer"
+                  className="w-full bg-gradient-to-r from-blue-500 via-teal-500 to-green-500 hover:from-blue-600 hover:via-teal-600 hover:to-green-600 text-white text-base sm:text-xl font-bold p-4 sm:p-6 rounded-md shadow-xl transition-colors duration-300 ease-in-out cursor-pointer"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? (
