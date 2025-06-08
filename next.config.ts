@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "next-ecommerce-app.oneentry.cloud/",
+        hostname: "next-ecommerce-app.oneentry.cloud",
       },
       { protocol: "https", hostname: "assets.entrepreneur.com" },
     ],

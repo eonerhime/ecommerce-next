@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import useCartStore from "@/stores/cartStore";
 import getUserSession from "@/actions/auth/getUserSession";
 import { IUserEntity } from "oneentry/dist/users/usersInterfaces";
+import Image from "next/image";
 
 export default function CartPage() {
   const router = useRouter();
@@ -83,7 +84,10 @@ export default function CartPage() {
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4">
                     <div className="flex items-center space-x-4 mb-4 sm:mb-0">
-                      <img
+                      <Image
+                        width={64}
+                        height={64}
+                        quality={80}
                         src={item.image}
                         alt={item.name}
                         className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-md"
